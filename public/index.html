@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Regex Validation</title>
+</head>
+<body>
+    <h1>Regex Validation Example</h1>
+    <form id="validation-form">
+        <label for="input">Enter Text:</label>
+        <input type="text" id="input" name="input">
+        <button type="submit">Submit</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        const form = document.getElementById('validation-form');
+        const resultElement = document.getElementById('result');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const input = document.getElementById('input').value;
+
+            const response = await fetch('/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ input })
+            });
+
+            const data = await response.json();
+            resultElement.textContent = data.message;
+        });
+    </script>
+</body>
+</html>
