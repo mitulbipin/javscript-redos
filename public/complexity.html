@@ -4,7 +4,7 @@
     <title>Regex Validation</title>
 </head>
 <body>
-    <h1>Regex Validation Example</h1>
+    <h1>Timeout</h1>
     <form id="validation-form">
         <label for="input">Enter Text:</label>
         <input type="text" id="input" name="input">
@@ -21,7 +21,7 @@
 
             const input = document.getElementById('input').value;
 
-            const response = await fetch('/index', {
+            const response = await fetch('/complexity', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
