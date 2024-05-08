@@ -4,10 +4,11 @@
 var RE2 = require("re2");
 var bodyParser = require('body-parser');    
 var express = require('express');
-// const vm = require('vm');
+const dns = require('dns');
 //var super_regexp = require('super-regex');
 //import {isMatch} from 'super-regex';
 const app = express();
+const PORT = 3000;
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
@@ -27,8 +28,8 @@ app.post('/index',(req, res) => {
 
 app.post('/diff_regex_engine',(req, res) => {
     const input = req.body.input;
-    var re = new RE2(/A(B|C+)+D/);
-    const regex = /A(B|C+)+D/; 
+    var re = new RE2(/^([a-zA-Z0-9._]+)+@gmail\.com$/); // Uses RE2 regex engine, this does not support backtracking
+
     const result = re.test(input);
   
     if (result) {
@@ -37,7 +38,6 @@ app.post('/diff_regex_engine',(req, res) => {
       res.status(400).send('Regex did not match');
     }
 });
-const dns = require('dns');
 
 function validateEmailDomain(email) {
     return new Promise((resolve, reject) => {
@@ -115,7 +115,22 @@ app.post('/timeout', (req, res) => {
     console.timeEnd('request');
 });
 
+app.post('/limit_input',(req, res) => {
+    const input = req.body.input;
+    const regex = /A(B|C+)+D/; 
 
-app.listen(3001, () => {
-    console.log(`Server is running on http://localhost:`);
+    if (input.length > 1000) // developer's choice
+        res.status(400).send('Input length is too long');
+
+    const result = regex.test(input);
+    
+    if (result) {
+      res.send('Regex matched successfully');
+    } else {
+      res.status(400).send('Regex did not match');
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
