@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JS Alternate Regex</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            padding: 20px 0;
+        }
+        #regex-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 0 auto;
+            width: 50%;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        label, input, button {
+            width: 100%;
+        }
+        button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #char-count {
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Javascript - ReDoS</h1>
+    <form id="regex-form">
+        <label for="input">Enter Text:</label>
+        <input type="text" id="input" name="input">
+        <button type="submit">Submit</button>
+    </form>
+    <p id="char-count">Character count: 0</p>
+    <p id="result"></p>
+
+    <script>
+        const form = document.getElementById('regex-form');
+        const resultElement = document.getElementById('result');
+        const charCountElement = document.getElementById('char-count');
+        const inputElement = document.getElementById('input');
+
+        // Update character count on input
+        inputElement.addEventListener('input', () => {
+            charCountElement.textContent = `Character count: ${inputElement.value.length}`;
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const input = inputElement.value;
+
+            const response = await fetch('/diff_regex_engine', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ input })
+            });
+
+            const data = await response.text();
+            resultElement.textContent = data;
+
+            if (response.status === 200) {
+                resultElement.style.color = 'green';
+            } else {
+                resultElement.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>

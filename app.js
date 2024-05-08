@@ -1,15 +1,97 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-//const bodyParser = require('body-parser');
-// const util = require('util');
-import util from 'util';
-import vm from 'vm';
+//import express from 'express';
+//import bodyParser from 'body-parser';
+//import RE2 from 're2';
+var RE2 = require("re2");
+var bodyParser = require('body-parser');    
+var express = require('express');
 // const vm = require('vm');
-import {isMatch} from 'super-regex';
+//var super_regexp = require('super-regex');
+//import {isMatch} from 'super-regex';
 const app = express();
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
+
+app.post('/index',(req, res) => {
+    const input = req.body.input;
+    const regex = /A(B|C+)+D/; 
+
+    const result = regex.test(input);
+  
+    if (result) {
+      res.send('Regex matched successfully');
+    } else {
+      res.status(400).send('Regex did not match');
+    }
+});
+
+app.post('/diff_regex_engine',(req, res) => {
+    const input = req.body.input;
+    var re = new RE2(/A(B|C+)+D/);
+    const regex = /A(B|C+)+D/; 
+    const result = re.test(input);
+  
+    if (result) {
+      res.send('Regex matched successfully');
+    } else {
+      res.status(400).send('Regex did not match');
+    }
+});
+const dns = require('dns');
+
+function validateEmailDomain(email) {
+    return new Promise((resolve, reject) => {
+        const domain = email.substring(email.lastIndexOf("@") + 1);
+        dns.resolveMx(domain, (err, addresses) => {
+            if (err) {
+                console.error('Error while resolving MX records:', err);
+                resolve(false);
+            } else if (addresses && addresses.length > 0) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        });
+    });
+}
+
+function validateEmailAddress(email) {
+    if (typeof email !== 'string') return false;
+    validateEmailDomain(email)
+    .then(isValid => {
+        if (!isValid) {
+            return false;
+        }
+    });
+
+    const atSymbolIndex = email.indexOf('@');
+    const dotSymbolIndex = email.lastIndexOf('.');
+
+    return (atSymbolIndex > 0 && dotSymbolIndex > atSymbolIndex + 1 && dotSymbolIndex < email.length - 1);
+    
+}
+
+app.post('/alternate_logic',(req, res) => {
+    const input = req.body.input;
+
+  
+    if (validateEmailAddress(input)) {
+      res.send('Email validated successfully');
+    } else {
+      res.status(400).send('Error validating email');
+    }
+});
+
+app.post('/repair', (req, res) => {
+    const input = req.body.input;
+    const regex = /A((?:(?:(?!.).)|(?:(?:[BC])+)))D/; // Repaired Regular Expression
+
+    if (regex.test(input)) {
+        res.status(200).json({ message: 'Input is valid' });
+    } else {
+        res.status(400).json({ message: 'Invalid input' });
+    }
+});
 
 app.post('/timeout', (req, res) => {
     const input = req.body.input;
@@ -25,7 +107,7 @@ app.post('/timeout', (req, res) => {
     //     res.status(400).json({ message: 'Invalid input' });
     // }
     console.time('request');
-        if (isMatch(/A(B|C+)+D/, input, { timeout: 1000 })) {
+        if (super_regexp.isMatch(/A(B|C+)+D/, input, { timeout: 1000 })) {
             res.status(200).json({ message: 'Input is valid' });
         } else {
             res.status(400).json({ message: 'Invalid input' });
@@ -33,50 +115,7 @@ app.post('/timeout', (req, res) => {
     console.timeEnd('request');
 });
 
-// app.post('/complexity', (req, res) => {
-//     const input = req.body.input;
-//     const regex = /A(B|C+)+D/; // Example regex
 
-//     const start = process.hrtime.bigint(); // Get the start time
-//     regex.test(input); // Perform the regex match
-//     const end = process.hrtime.bigint(); // Get the end time
-
-//     // Calculate the difference in milliseconds and use it as the score
-//     const score = Number(end - start) / 1e6;
-
-//     // Set the score as a custom HTTP header in the response
-//     res.setHeader('X-Regex-Complexity', score);
-
-//     res.send('OK');
-// });
-
-app.post('/index',(req, res) => {
-    const input = req.body.input;
-    const regex = /A(B|C+)+D/; // Example regex
-
-    const result = regex.test(input);
-  
-    if (result) {
-      res.send('Regex matched successfully');
-    } else {
-      res.status(400).send('Regex did not match');
-    }
-});
-
-
-
-app.post('/repair', (req, res) => {
-    const input = req.body.input;
-    const regex = /A((?:(?:(?!.).)|(?:(?:[BC])+)))D/; // Repaired Regular Expression
-
-    if (regex.test(input)) {
-        res.status(200).json({ message: 'Input is valid' });
-    } else {
-        res.status(400).json({ message: 'Invalid input' });
-    }
-});
-
-// Start the server
-app.listen(3000, () => {
-    console.log(`Server is running on http://localhost:3000`);
+app.listen(3001, () => {
+    console.log(`Server is running on http://localhost:`);
 });

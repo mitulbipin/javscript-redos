@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>Regex Validation Example</h1>
-    <form id="validation-form">
+    <form id="regex-form">
         <label for="input">Enter Text:</label>
         <input type="text" id="input" name="input">
         <button type="submit">Submit</button>
@@ -13,7 +13,7 @@
     <p id="result"></p>
 
     <script>
-        const form = document.getElementById('validation-form');
+        const form = document.getElementById('regex-form');
         const resultElement = document.getElementById('result');
 
         form.addEventListener('submit', async (event) => {
@@ -29,8 +29,8 @@
                 body: JSON.stringify({ input })
             });
 
-            const data = await response.json();
-            resultElement.textContent = data.message;
+            const data = await response.text();
+            resultElement.textContent = data;
         });
     </script>
 </body>
