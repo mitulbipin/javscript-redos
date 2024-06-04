@@ -8,7 +8,7 @@ const dns = require('dns');
 //var super_regexp = require('super-regex');
 //import {isMatch} from 'super-regex';
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
