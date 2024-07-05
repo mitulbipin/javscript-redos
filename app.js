@@ -1,17 +1,19 @@
-//import express from 'express';
-//import bodyParser from 'body-parser';
-//import RE2 from 're2';
-var RE2 = require("re2");
-var bodyParser = require('body-parser');    
-var express = require('express');
-const dns = require('dns');
-//var super_regexp = require('super-regex');
-//import {isMatch} from 'super-regex';
+import express from 'express';
+import bodyParser from 'body-parser';
+import RE2 from 're2';
+import dns from 'dns';
+import functionTimeout from 'function-timeout';
+
+import router from './cve-2017-16100.js';
+import router_cve_2021_21267 from './cve-2021-21267.js';
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
+app.use('/cve-2017-16100', router);
+app.use('/cve-2021-21267', router_cve_2021_21267);
 
 app.post('/index',(req, res) => {
     const input = req.body.input;
@@ -93,27 +95,27 @@ app.post('/repair', (req, res) => {
     }
 });
 
-app.post('/timeout', (req, res) => {
-    const input = req.body.input;
-    const regex = /A(B|C+)+D/; // Example regex
-    // if (regex.test(input)) {
-    //     res.status(200).json({ message: 'Input is valid' });
-    // } else {
-    //     res.status(400).json({ message: 'Invalid input' });
-    // }
-    // if (isMatch(/A(B|C+)+D/,input,{timeout: 1000})) {
-    //     res.status(200).json({ message: 'Input is valid' });
-    // } else {
-    //     res.status(400).json({ message: 'Invalid input' });
-    // }
-    console.time('request');
-        if (super_regexp.isMatch(/A(B|C+)+D/, input, { timeout: 1000 })) {
-            res.status(200).json({ message: 'Input is valid' });
-        } else {
-            res.status(400).json({ message: 'Invalid input' });
-        }
-    console.timeEnd('request');
-});
+// app.post('/timeout', (req, res) => {
+//     const input = req.body.input;
+//     const regex = /A(B|C+)+D/; 
+//     // if (regex.test(input)) {
+//     //     res.status(200).json({ message: 'Input is valid' });
+//     // } else {
+//     //     res.status(400).json({ message: 'Invalid input' });
+//     // }
+//     // if (isMatch(/A(B|C+)+D/,input,{timeout: 1000})) {
+//     //     res.status(200).json({ message: 'Input is valid' });
+//     // } else {
+//     //     res.status(400).json({ message: 'Invalid input' });
+//     // }
+//     console.time('request');
+//         if (super_regexp.isMatch(/A(B|C+)+D/, input, { timeout: 1000 })) {
+//             res.status(200).json({ message: 'Input is valid' });
+//         } else {
+//             res.status(400).json({ message: 'Invalid input' });
+//         }
+//     console.timeEnd('request');
+// });
 
 app.post('/limit_input',(req, res) => {
     const input = req.body.input;
@@ -130,6 +132,24 @@ app.post('/limit_input',(req, res) => {
       res.status(400).send('Regex did not match');
     }
 });
+
+function regexMatch(input) {
+    const regex = /A(B|C+)+D/;
+    return regex.test(input);
+}
+
+const regexMatchWithTimeout = functionTimeout(regexMatch, {timeout:1000}); 
+
+app.get('/timeout', (req, res) => {
+    try {
+        const result = regexMatchWithTimeout(req.query.input);
+        res.send({ result });
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).send({ error: 'Regex operation timed out or failed' });
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
