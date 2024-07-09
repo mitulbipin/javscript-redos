@@ -6,14 +6,17 @@ import functionTimeout from 'function-timeout';
 
 import router from './cve-2017-16100.js';
 import router_cve_2021_21267 from './cve-2021-21267.js';
+import router_cve_2021_23346 from './cve-2021-23346.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
+
 app.use('/cve-2017-16100', router);
 app.use('/cve-2021-21267', router_cve_2021_21267);
+app.use('/cve-2021-23346', router_cve_2021_23346);
 
 app.post('/index',(req, res) => {
     const input = req.body.input;
