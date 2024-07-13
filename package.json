@@ -19,7 +19,7 @@
     "function-timeout": "^1.0.2",
     "html-parse-stringify": "^2.0.0",
     "jsdom": "^24.1.0",
-    "re2": "^1.20.11",
+    "re2": "^1.21.3",
     "sanitize": "^2.1.2",
     "schema-inspector": "^2.1.0",
     "super-regex": "^0.3.0",
