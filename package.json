@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.20.2",
+    "body-parser": "^1.20.3",
     "connect-timeout": "^1.9.0",
     "dns-sync": "^0.2.1",
     "dompurify": "^3.1.5",
